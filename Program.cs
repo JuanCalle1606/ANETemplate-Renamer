@@ -7,30 +7,57 @@ namespace ANETemplate_Renamer
 {
 	class Program
 	{
+		/// <summary>
+		///		The path where the project is located
+		/// </summary>
+		public static string Path = "../native_library/win/";
 
+		/// <summary>
+		///		Here all the renaming happens
+		/// </summary>
+		/// <param name="newName">The current name of the project</param>
+		/// <param name="oldName">The new name of the project</param>
 		static void Start(string newName, string oldName)
-        {
+		{
 			Console.WriteLine("\nANETemplate Renamer by Juan Calle\n");
-			Console.WriteLine($"\n### Renaming the project from {oldName} to {newName} ###");
+
+			Console.WriteLine($"\n### Renaming the project from {oldName} to {newName} ###\n");
+
+			Console.WriteLine($"## Working on {Path} ##\n");
+
+			Ren(oldName, newName);
 		}
+		/// <summary>
+		///		Rename a file or directory
+		/// </summary>
+		/// <param name="oldName">the current name of the file or directory</param>
+		/// <param name="newName">the new name of the file or directory</param>
+		static void Ren(string oldName, string newName)
+		{
+			Execute($"ren \"{Path}{oldName}\" {newName}");
+		}
+		/// <summary>
+		///		Program entry point
+		/// </summary>
+		/// <param name="args">The command line arguments</param>
+		/// <returns></returns>
 		static int Main(String[] args)
 		{
 			// Create a root command with some options
 			var rootCommand = new RootCommand
 			{
 				new Option<string>(
-					"--new-name",
+					new string[]{"--new-name","-nn"},
 					"The new name for the project. " +
 					"If this option is not specified, it will be requested in the program."),
 				new Option<string>(
-					"--old-name",
+					new string[]{"--old-name","-on"},
 					()=>"TemplateANE",
 					"Indicates the current name of the project, it will be replaced by the new name.")
 			};
 
 			rootCommand.Description = "My sample app";
 
-			// Note that the parameters of the handler method are matched according to the names of the options
 			rootCommand.Handler = CommandHandler.Create<string, string>((string newName,string oldName) =>
 			{
 				Console.Clear();
@@ -49,6 +76,11 @@ namespace ANETemplate_Renamer
 			// Parse the incoming args and invoke the handler
 			return rootCommand.InvokeAsync(args).Result;
 		}
+		/// <summary>
+		///		Run a command in the windows cmd
+		/// </summary>
+		/// <param name="_Command">The complete command as it would be written in cmd</param>
+		/// <returns></returns>
 		private static string Execute(string _Command)
 		{
 			System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c " + _Command);
