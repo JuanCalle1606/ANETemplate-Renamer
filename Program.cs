@@ -23,6 +23,11 @@ namespace ANETemplate_Renamer
 
 			Console.WriteLine($"\n### Renaming the project from {oldName} to {newName} ###\n");
 
+			if(Execute($"if exist {Path}/{oldName} echo yes").IndexOf("yes") < 0)
+			{
+				Console.WriteLine($"The current project does not have the name {oldName} so it cannot be renamed");
+            }
+
 			Console.WriteLine($"## Working on {Path} ##\n");
 
 			Ren(oldName, newName);
@@ -34,7 +39,10 @@ namespace ANETemplate_Renamer
 		/// <param name="newName">the new name of the file or directory</param>
 		static void Ren(string oldName, string newName)
 		{
-			Execute($"ren \"{Path}{oldName}\" {newName}");
+			if(Execute($"if exist \"{Path}{oldName}\" (ren \"{Path}{oldName}\" {newName}) else (echo error)").IndexOf("error")>=0)
+            {
+				Console.WriteLine($"{Path}{oldName} cannot be renamed because it does not exist, this may be because it has been deleted or a renaming process was canceled");
+            }
 		}
 		/// <summary>
 		///		Program entry point
